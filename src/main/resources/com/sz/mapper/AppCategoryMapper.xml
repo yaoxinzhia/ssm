@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper  namespace="com.sz.mapper.AppCategoryMapper">
+
+    <select id="queryAllLevelOne" resultType="com.sz.pojo.AppCategory">
+        SELECT id,categoryCode,categoryName
+        FROM app_category
+        WHERE parentId IS NULL
+    </select>
+
+    <select id="queryLevelByParentId" resultType="com.sz.pojo.AppCategory">
+        SELECT id,categoryCode,categoryName
+        FROM app_category
+        WHERE parentId = #{id}
+    </select>
+</mapper>

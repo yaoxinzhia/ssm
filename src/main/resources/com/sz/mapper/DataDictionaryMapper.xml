@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper  namespace="com.sz.mapper.DataDictionaryMapper">
+
+    <!--SELECT id,typeCode,valueId,valueName
+    FROM data_dictionary
+    WHERE typeCode = 'APP_FLATFORM'-->
+    <!-- 查询所有状态 -->
+    <select id="queryAllAppStatus" resultType="com.sz.pojo.DataDictionary">
+        SELECT id,typeCode,valueId,valueName
+        FROM data_dictionary
+        WHERE typeCode = 'APP_STATUS'
+    </select>
+
+    <!-- 查询所有APP平台 -->
+    <select id="queryAllFlatForms" resultType="com.sz.pojo.DataDictionary">
+        SELECT id,typeCode,valueId,valueName
+        FROM data_dictionary
+        WHERE typeCode = 'APP_FLATFORM'
+    </select>
+</mapper>

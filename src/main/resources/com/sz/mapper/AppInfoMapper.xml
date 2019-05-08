@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper  namespace="com.sz.mapper.AppInfoMapper">
+
+    <resultMap id="base" type="com.sz.pojo.AppInfo">
+        <id property="id" column="appInfoId"></id>
+        <result property="APKName" column="APKName" />
+        <result property="softwareName" column="softwareName" />
+        <result property="softwareSize" column="softwareSize" />
+        <!--<result property="softwareSize" column="softwareSize" javaType="java.math.BigDecimal"/>-->
+        <!--<result property="flatformId" column="flatformId" />-->
+        <!--<result property="status" column="status" />-->
+        <result property="downloads" column="downloads" />
+    </resultMap>
+
+    <resultMap id="appSingleDetail" type="com.sz.pojo.AppInfo" extends="base">
+        <result property="appInfo" column="appInfo" />
+        <result property="creationDate" column="creationDate" />
+        <result column="interfaceLanguage" property="interfaceLanguage" />
+        <result column="logoLocPath" property="logoLocPath"/>
+        <result column="logoPicPath" property="logoPicPath"/>
+        <result column="offSaleDate" property="offSaleDate"/>
+        <result column="onSaleDate" property="onSaleDate"/>
+        <result column="supportROM" property="supportROM"/>
+        <result column="updateDate" property="updateDate"/>
+        <association property="categoryLevel1" javaType="com.sz.pojo.AppCategory">
+            <id property="id" column="level1One"/>
+            <result column="level1Name" property="categoryName"/>
+        </association>
+        <association property="categoryLevel2" javaType="com.sz.pojo.AppCategory">
+            <id property="id" column="level2Id"/>
+            <result column="level2Name" property="categoryName"/>
+        </association>
+        <association property="categoryLevel3" javaType="com.sz.pojo.AppCategory">
+            <id property="id" column="level3Id"/>
+            <result column="level3Name" property="categoryName"/>
+        </association>
+
+        <!-- 封装状态信息 -->
+        <association property="appStatus" javaType="com.sz.pojo.DataDictionary">
+            <result column="statusId" property="valueId" />
+            <result column="statusName" property="valueName" />
+        </association>
+
+        <!-- 封装平台信息 -->
+        <association property="flatform" javaType="com.sz.pojo.DataDictionary">
+            <result column="flatformId" property="valueId" />
+            <result column="flatformName" property="valueName" />
+        </association>
+
+        <!-- 最新版本信息封装 -->
+        <association property="newAppVersion" javaType="com.sz.pojo.AppVersion">
+            <id column="versionId" property="id" />
+            <result property="versionNo" column="versionNo" />
+        </association>
+
+
+        <!-- 创建者 -->
+        <association property="createUser" javaType="com.sz.pojo.DevUser">
+            <id property="id" column="createId" />
+            <result property="devName" column="createName" />
+        </association>
+        <!-- 修改者 -->
+        <association property="modifyUser" javaType="com.sz.pojo.DevUser">
+            <id property="id" column="modifyId" />
+            <result property="devName" column="modifyName" />
+        </association>
+        <!-- 开发者 -->
+        <association property="devUser" javaType="com.sz.pojo.DevUser">
+            <id property="id" column="devId" />
+            <result property="devName" column="devName" />
+        </association>
+
+    </resultMap>
+
+
+    <resultMap id="appInfoDetail" type="com.sz.pojo.AppInfo" extends="base">
+        <!-- 封装平台信息 -->
+        <association property="flatform" javaType="com.sz.pojo.DataDictionary">
+            <result property="valueName" column="flatform_name" />
+        </association>
+        <!-- 封装app状态的信息 -->
+        <association property="appStatus" javaType="com.sz.pojo.DataDictionary">
+            <result property="valueName" column="app_status" />
+        </association>
+
+        <!-- 封装一级分类 -->
+        <association property="categoryLevel1" javaType="com.sz.pojo.AppCategory">
+            <result property="categoryName" column="category_level_one_name" />
+        </association>
+        <!-- 封装二级分类 -->
+        <association property="categoryLevel2" javaType="com.sz.pojo.AppCategory">
+            <result property="categoryName" column="category_level_two_name" />
+        </association>
+        <!-- 封装三级分类 -->
+        <association property="categoryLevel3" javaType="com.sz.pojo.AppCategory">
+            <result property="categoryName" column="category_level_three_name" />
+        </association>
+
+        <!-- 封装最新的APP版本对象-->
+        <association property="newAppVersion" javaType="com.sz.pojo.AppVersion">
+            <id property="id" column="versionId"></id>
+            <result property="versionNo" column="versionNo" />
+        </association>
+    </resultMap>
+
+
+
+    <!--<resultMap id="appInfoWithThreeCategoryAndVersion" type="com.sz.pojo.AppInfo" extends="base">
+        &lt;!&ndash; 封装最新的APP版本对象&ndash;&gt;
+        &lt;!&ndash; 这个property是指AppInfo中的实体类，指向AppVersion类型&ndash;&gt;
+        <association property="newAppVersion" javaType="com.sz.pojo.AppVersion">
+            &lt;!&ndash; 这个前面的property指AppVersion中的id，后面的column指SQL select查询中的&ndash;&gt;
+            <id property="id" column="versionId"></id>
+            <result property="versionNo" column="versionNo" />
+        </association>
+        <association property="categoryLevel1" javaType="com.sz.pojo.AppCategory">
+            <result property="categoryName" column="category_level_one_name" />
+        </association>
+        <association property="categoryLevel2" javaType="com.sz.pojo.AppCategory">
+            <result property="categoryName" column="category_level_two_name" />
+        </association>
+        <association property="categoryLevel3" javaType="com.sz.pojo.AppCategory">
+            <result property="categoryName" column="category_level_three_name" />
+        </association>
+    </resultMap>-->
+
+    <!-- 根据开发者id，查询APP信息-->
+    <!--<select id="queryByDevUserId" resultMap="appInfoWithThreeCategoryAndVersion">
+        SELECT
+            t1.id appId,
+            t1.softwareName,
+            t1.APKName,
+            t1.softwareSize,
+            t1.flatformId,
+            t1.status,
+            t1.downloads,
+            t1.versionId,
+            tc1.categoryName AS categoryLevel1Name,
+            tc2.categoryName AS categoryLevel2Name,
+            tc3.categoryName AS categoryLevel3Name,
+            t3.versionNo
+        FROM
+            app_info t1
+        LEFT JOIN app_category tc1 ON t1.categoryLevel1 = tc1.id
+        LEFT JOIN app_category tc2 ON t1.categoryLevel2 = tc2.id
+        LEFT JOIN app_category tc3 ON t1.categoryLevel3 = tc3.id
+        LEFT JOIN app_version t3 ON t1.versionId = t3.id
+        , dev_user t4
+        WHERE t1.devId = t4.id
+        and t4.id = #{devUserId}
+    </select>-->
+
+    <!--
+        根据这个软件的名称
+        所属的平台
+        app状态
+        一级分类
+        二级分类
+        三级分类
+       查询
+    -->
+    <select id="query" resultMap="appInfoDetail">
+        SELECT
+        t1.id as appInfoId,
+        t1.softwareName,
+        t1.APKName,
+        t1.softwareSize,
+        t1.downloads,
+        t2.valueName AS flatform_name,
+        t6.valueName AS app_status,
+        t3.categoryName AS category_level_one_name,
+        t4.categoryName AS category_level_two_name,
+        t5.categoryName AS category_level_three_name,
+        t7.versionNo,
+        t1.versionId
+        FROM app_info t1 LEFT JOIN data_dictionary t2 ON t1.flatformId = t2.valueId
+        LEFT JOIN app_category t3 ON t1.categoryLevel1 = t3.id
+        LEFT JOIN app_category t4 on t1.categoryLevel2 = t4.id
+        LEFT JOIN app_category t5 on t1.categoryLevel3 = t5.id
+        LEFT JOIN data_dictionary t6 ON t1.`status` = t6.valueId
+        LEFT JOIN app_version t7 ON t1.versionId = t7.id
+        left join dev_user t8 on t1.devId = t8.id
+        <where>
+            t2.typeCode = 'APP_FLATFORM'
+            AND t6.typeCode = 'APP_STATUS'
+
+            <if test="appFlatForm != null">
+                and t1.flatformId = #{appFlatForm}
+            </if>
+            <if test="appStatus != null">
+                and t1.`status` = #{appStatus}
+            </if>
+            <if test="levelOne != null">
+                and t1.categoryLevel1 = #{levelOne}
+            </if>
+            <if test="levelTwo != null">
+                and t1.categoryLevel2 = #{levelTwo}
+            </if>
+            <if test="levelThree != null">
+                and t1.categoryLevel3 = #{levelThree}
+            </if>
+            <if test="softwareName != null and softwareName != ''">
+                and t1.softwareName like concat('%',#{softwareName},'%')
+            </if>
+        </where>
+
+    </select>
+
+
+    <insert id="add">
+        insert into app_info
+        <trim prefix="(" suffix=")" prefixOverrides=",">
+            <if test="softwareName != null and softwareName != ''">
+                ,softwareName
+            </if>
+            <if test="APKName != null and APKName != ''">
+                ,APKName
+            </if>
+            <if test="supportROM != null and supportROM != ''">
+                ,supportROM
+            </if>
+            <if test="interfaceLanguage != null and interfaceLanguage != ''">
+                ,interfaceLanguage
+            </if>
+            <if test="softwareSize != null">
+                ,softwareSize
+            </if>
+            <if test="updateDate != null">
+                ,updateDate
+            </if>
+            <if test="devUser != null and devUser.id != null">
+                ,devId
+            </if>
+            <if test="appInfo != null and appInfo != ''">
+                ,appInfo
+            </if>
+            <if test="creationDate != null">
+                ,creationDate
+            </if>
+            <if test="appStatus != null and appStatus.valueId != null">
+                ,status
+            </if>
+            <if test="onSaleDate != null">
+                ,onSaleDate
+            </if>
+            <if test="flatform != null and flatform.valueId != null">
+                ,flatformId
+            </if>
+            <if test="categoryLevel1 != null and categoryLevel1.id != null">
+                ,categoryLevel1
+            </if>
+            <if test="categoryLevel2 != null and categoryLevel2.id != null">
+                ,categoryLevel2
+            </if>
+            <if test="categoryLevel3 != null and categoryLevel3.id != null">
+                ,categoryLevel3
+            </if>
+            <if test="downloads != null">
+                ,downloads
+            </if>
+            <if test="devUser != null and devUser.id != null">
+                ,createdBy
+            </if>
+            <if test="modifyBy != null">
+                ,modifyBy
+            </if>
+            <if test="modifyDate != null">
+                ,modifyDate
+            </if>
+            <if test="logoPicPath != null">
+                ,logoPicPath
+            </if>
+            <if test="logoLocPath != null">
+                ,logoLocPath
+            </if>
+            <if test="newAppVersion != null and newAppVersion.id != null">
+                ,versionId
+            </if>
+        </trim>
+        <trim prefix="values(" suffix=")" prefixOverrides=",">
+            <if test="softwareName != null and softwareName != ''">
+                ,#{softwareName}
+            </if>
+            <if test="APKName != null and APKName != ''">
+                ,#{APKName}
+            </if>
+            <if test="supportROM != null and supportROM != ''">
+                ,#{supportROM}
+            </if>
+            <if test="interfaceLanguage != null and interfaceLanguage != ''">
+                ,#{interfaceLanguage}
+            </if>
+            <if test="softwareSize != null">
+                ,#{softwareSize}
+            </if>
+            <if test="updateDate != null">
+                ,#{updateDate}
+            </if>
+            <if test="devUser != null and devUser.id != null">
+                ,#{devUser.id}
+            </if>
+            <if test="appInfo != null and appInfo != ''">
+                ,#{appInfo}
+            </if>
+            <if test="creationDate != null">
+                ,#{creationDate}
+            </if>
+            <if test="appStatus != null and appStatus.valueId != null">
+                ,#{appStatus.valueId}
+            </if>
+            <if test="onSaleDate != null">
+                ,#{onSaleDate}
+            </if>
+            <if test="flatform != null and flatform.valueId != null">
+                ,#{flatform.valueId}
+            </if>
+            <if test="categoryLevel1 != null and categoryLevel1.id != null">
+                ,#{categoryLevel1.id}
+            </if>
+            <if test="categoryLevel2 != null and categoryLevel2.id != null">
+                ,#{categoryLevel2.id}
+            </if>
+            <if test="categoryLevel3 != null and categoryLevel3.id != null">
+                ,#{categoryLevel3.id}
+            </if>
+            <if test="downloads != null">
+                ,#{downloads}
+            </if>
+            <if test="devUser != null and devUser.id != null">
+                ,#{devUser.id}
+            </if>
+            <if test="modifyBy != null">
+                ,#{modifyBy}
+            </if>
+            <if test="modifyDate != null">
+                ,#{modifyDate}
+            </if>
+            <if test="logoPicPath != null">
+                ,#{logoPicPath}
+            </if>
+            <if test="logoLocPath != null">
+                ,#{logoLocPath}
+            </if>
+            <if test="newAppVersion != null and newAppVersion.id != null">
+                ,#{newAppVersion.id}
+            </if>
+        </trim>
+    </insert>
+
+
+    <delete id="deleteById">
+        delete from  app_info where id = #{id}
+    </delete>
+
+    <select id="queryById" resultMap="appSingleDetail">
+        select
+        t1.id as appInfoId,t1.appInfo,t1.APKName,t1.creationDate,
+        t1.downloads,t1.interfaceLanguage,t1.logoLocPath,t1.logoPicPath,t1.offSaleDate,
+        t1.onSaleDate,t1.softwareName,t1.softwareSize,t1.supportROM,t1.updateDate,
+        c1.id as level1One,c2.id as level2Id, c3.id as level3Id,
+        c1.categoryName level1Name,c2.categoryName level2Name,c3.categoryName level3Name,
+        d1.valueId statusId,d1.valueName statusName,
+        d2.valueId flatformId,d2.valueName flatformName,
+        v1.id versionId,v1.versionNo,
+        u1.id createId,u1.devName createName,
+        u2.id modifyId,u2.devName modifyName,
+        u3.id devId ,u3.devName devName
+        from app_info t1
+        left join app_category c1 on t1.categoryLevel1 = c1.id
+        left join app_category c2 on t1.categoryLevel2 = c2.id
+        left join app_category c3 on t1.categoryLevel3 = c3.id
+        left join data_dictionary d1 on t1.status = d1.valueId
+        left join data_dictionary d2 on t1.flatformId = d1.valueId
+        left join app_version v1 on t1.versionId = v1.versionNo
+        left join dev_user u1 on t1.createdBy = u1.id
+        left join dev_user u2 on t1.modifyBy = u2.id
+        left join dev_user u3 on t1.devId = u3.id
+        where
+        d1.typeCode = 'APP_STATUS'
+        and t1.id = #{id}
+    </select>
+
+
+    <update id="update">
+        update app_info
+        <trim prefixOverrides="," prefix="set">
+            <if test="softwareName != null and softwareName != ''">
+                softwareName = #{softwareName}
+            </if>
+            <if test="APKName != null and APKName != ''">
+                ,APKName = #{APKName}
+            </if>
+            <if test="supportROM != null and supportROM != ''">
+                ,supportROM = #{supportROM}
+            </if>
+            <if test="interfaceLanguage != null and interfaceLanguage != ''">
+                ,interfaceLanguage = #{interfaceLanguage}
+            </if>
+            <if test="softwareSize != null ">
+                ,softwareSize = #{softwareSize}
+            </if>
+            <if test="updateDate != null ">
+                ,updateDate = #{updateDate}
+            </if>
+            <if test="devUser != null and devUser.id != null">
+                ,devId = #{devUser.id}
+            </if>
+            <if test="appInfo != null and appInfo != ''">
+                ,appInfo = #{appInfo}
+            </if>
+            <if test="appStatus != null and appStatus.valueId != ''">
+                ,status = #{appStatus.valueId}
+            </if>
+            <if test="onSaleDate != null ">
+                ,onSaleDate = #{offSaleDate}
+            </if>
+            <if test="offSaleDate != null ">
+                ,offSaleDate = #{offSaleDate}
+            </if>
+            <!--<if test="flatform != null and flatform.valueId != null">
+                ,flatformId
+            </if>-->
+            <if test="flatform != null and flatform.id != ''">
+                ,flatformId = #{flatform.id}
+            </if>
+            <if test="categoryLevel1 != null and categoryLevel1.id != ''">
+                ,categoryLevel1 = #{categoryLevel1.id}
+            </if>
+            <if test="categoryLevel2 != null and categoryLevel2.id != ''">
+                ,categoryLevel2 = #{categoryLevel2.id}
+            </if>
+            <if test="categoryLevel3 != null and categoryLevel3.id != ''">
+                ,categoryLevel3 = #{categoryLevel3.id}
+            </if>
+            <if test="downloads != null ">
+                ,downloads = #{downloads}
+            </if>
+            <if test="createUser != null and createUser.id != ''">
+                ,createdBy = #{createUser.id}
+            </if>
+            <if test="modifyUser != null and modifyUser.id != ''">
+                ,modifyBy = #{modifyUser.id}
+            </if>
+            <if test="modifyDate != null ">
+                ,modifyDate = #{modifyDate}
+            </if>
+            <if test="logoPicPath != null and logoPicPath != ''">
+                ,logoPicPath = #{logoPicPath}
+            </if>
+            <if test="logoLocPath != null and logoLocPath !=''">
+                ,logoLocPath = #{logoLocPath}
+            </if>
+            <if test="newAppVersion != null and newAppVersion.id != null">
+                ,versionId = #{newAppVersion.id}
+            </if>
+            <if test="id != null ">
+                ,id = #{id}
+            </if>
+        </trim>
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+
+    </update>
+</mapper>
